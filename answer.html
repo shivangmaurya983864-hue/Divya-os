@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Analysis | Divya's Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #05070a; color: white; min-height: 100vh; }
+        .header-glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: sticky; top: 0; z-index: 100; }
+        .answer-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; transition: 0.3s; }
+        .answer-card:hover { border-color: rgba(129, 140, 248, 0.3); background: rgba(255, 255, 255, 0.04); }
+        .status-badge { padding: 4px 12px; border-radius: 100px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .correct-bg { background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); }
+        .wrong-bg { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); }
+    </style>
+</head>
+<body class="pb-12">
+
+<header class="header-glass p-4 mb-8">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <a href="result.html" class="text-gray-400 hover:text-white text-[10px] font-black uppercase tracking-[2px]">
+            <i class="fas fa-chevron-left mr-1"></i> Result
+        </a>
+        <h1 class="text-sm font-black uppercase tracking-[3px] text-gray-400">Analysis Center</h1>
+        <button onclick="clearHistory()" class="text-red-500 hover:text-red-400 text-[10px] font-black uppercase tracking-[2px]">
+            <i class="fas fa-trash-alt mr-1"></i> Clear Session
+        </button>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-extrabold mb-4">Performance <span class="text-indigo-500">Log</span></h2>
+    <div id="summary" class="mb-8 text-[11px] font-bold tracking-widest"></div>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-10">
+        <button id="filterBtn" onclick="toggleWrong()" class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
+            <i class="fas fa-eye mr-2"></i> Show All Answers
+        </button>
+        <button onclick="retryWrong()" class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
+            <i class="fas fa-redo-alt mr-2"></i> Retry Mistakes
+        </button>
+    </div>
+
+    <div id="answersContainer" class="space-y-6 text-left"></div>
+
+    <div class="mt-12">
+        <button onclick="location.href='sets.html'" class="bg-white text-black px-10 py-4 rounded-full font-black text-xs uppercase tracking-[2px] hover:bg-indigo-500 hover:text-white transition">
+            Next Level ⚡
+        </button>
+    </div>
+</main>
+
+<script>
+// ✅ Default TRUE kiya hai taaki sirf mistakes dikhein pehle
+let showWrongOnly = true;
+
+function toggleWrong() {
+    showWrongOnly = !showWrongOnly;
+    const btn = document.getElementById("filterBtn");
+    
+    if(showWrongOnly) {
+        btn.innerHTML = '<i class="fas fa-eye mr-2"></i> Show All Answers';
+        btn.classList.replace("text-red-400", "text-indigo-400");
+    } else {
+        btn.innerHTML = '<i class="fas fa-filter mr-2"></i> Only Mistakes';
+        btn.classList.add("text-red-400");
+    }
+    loadAnswers();
+}
+
+function clearHistory() {
+    if(confirm("Bhai, pura analysis clear kar dein?")) {
+        localStorage.removeItem("lastQuestions");
+        localStorage.removeItem("userAnswers");
+        location.reload();
+    }
+}
+
+function retryWrong() {
+    const questions = JSON.parse(localStorage.getItem("lastQuestions")) || [];
+    const userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
+    const wrong = questions.filter((q, i) => userAnswers[i] !== q.answer);
+
+    if(wrong.length === 0) {
+        alert("Shaandaar! Ek bhi galti nahi hai. 🔥");
+        return;
+    }
+
+    localStorage.setItem("retryMode", "true");
+    localStorage.setItem("retryQuestions", JSON.stringify(wrong));
+    location.href = "test.html";
+}
+
+function loadAnswers() {
+    const container = document.getElementById("answersContainer");
+    const summary = document.getElementById("summary");
+    container.innerHTML = "";
+
+    const questions = JSON.parse(localStorage.getItem("lastQuestions")) || [];
+    const userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
+
+    if(questions.length === 0) {
+        container.innerHTML = "<p class='text-center text-gray-500'>No data found. Start a test first!</p>";
+        return;
+    }
+
+    let attempted = 0, correct = 0, wrong = 0;
+
+    questions.forEach((q, i) => {
+        const user = userAnswers[i];
+        const correctLetter = q.answer;
+        const correctIndex = correctLetter ? correctLetter.charCodeAt(0) - 65 : -1;
+        const correctAns = q.options?.[correctIndex] || "N/A";
+
+        let userAns = "Not Attempted";
+        let isCorrect = false;
+
+        if (user && /^[A-D]$/.test(user)) {
+            attempted++;
+            const idx = user.charCodeAt(0) - 65;
+            userAns = q.options?.[idx] || "Error";
+            if (user === correctLetter) {
+                correct++;
+                isCorrect = true;
+            } else {
+                wrong++;
+            }
+        } else if (!user) {
+            // Not attempted counts as a mistake in review if we want to improve
+            wrong++; 
+        }
+
+        // ✅ Default filter logic: Agar showWrongOnly true hai, toh correct walo ko skip kar do
+        if (showWrongOnly && isCorrect) return;
+
+        const card = document.createElement("div");
+        card.className = "answer-card p-6";
+        card.innerHTML = `
+            <div class="flex justify-between mb-3">
+                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Question ${i + 1}</span>
+                <span class="status-badge ${isCorrect ? "text-green-400" : "text-red-400"}">
+                    ${isCorrect ? "✔ Perfect" : "✖ Mistake"}
+                </span>
+            </div>
+            <p class="mb-5 ${isCorrect ? "text-gray-200" : "text-red-200"} font-semibold leading-relaxed">
+                ${q.question}
+            </p>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl ${isCorrect ? "correct-bg border-green-500/20" : "wrong-bg border-red-500/20"} border">
+                    <p class="text-[9px] uppercase font-bold text-gray-500 mb-1">Your Choice</p>
+                    <p class="font-bold text-sm">${userAns}</p>
+                </div>
+                <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                    <p class="text-[9px] uppercase font-bold text-indigo-400 mb-1">Right Answer</p>
+                    <p class="font-bold text-sm text-indigo-100">${correctAns}</p>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+
+    if (container.innerHTML === "" && showWrongOnly) {
+        container.innerHTML = "<div class='text-center py-10'><i class='fas fa-trophy text-yellow-500 text-3xl mb-3'></i><p class='text-gray-400'>No mistakes to show! You are a pro. Click 'Show All' to see your wins.</p></div>";
+    }
+
+    const accuracy = attempted ? Math.round((correct / attempted) * 100) : 0;
+    summary.innerHTML = `
+        <span class="text-indigo-400">Attempted: ${attempted}</span> • 
+        <span class="text-green-400">Correct: ${correct}</span> • 
+        <span class="text-red-400">Wrong: ${wrong}</span> • 
+        <span class="text-yellow-400">Accuracy: ${accuracy}%</span>
+    `;
+}
+
+window.onload = loadAnswers;
+</script>
+</body>
+</html>

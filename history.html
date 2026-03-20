@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Mock History</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:sans-serif;
+padding:40px
+}
+
+.card{
+background:#1e293b;
+padding:25px;
+border-radius:10px;
+margin-bottom:25px
+}
+
+.option{
+padding:10px;
+border-radius:6px;
+border:1px solid #374151;
+margin-bottom:6px
+}
+
+.correct{
+background:#14532d;
+border-color:#22c55e
+}
+
+.wrong{
+background:#7f1d1d;
+border-color:#ef4444
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1 class="text-3xl font-bold mb-8">
+Mock Test History
+</h1>
+
+<div id="history"></div>
+
+<script>
+
+let history = JSON.parse(localStorage.getItem("examHistory")) || []
+
+const container=document.getElementById("history")
+
+if(history.length===0){
+container.innerHTML="<p>No test attempted yet</p>"
+}
+
+let test = history[history.length-1]
+
+if(!test){
+container.innerHTML="<p>No test attempted yet</p>"
+}
+
+let block=`
+
+<div class="card">
+
+<h2 class="text-xl font-bold mb-2">
+Last Mock Test
+</h2>
+
+<p class="text-sm text-gray-400 mb-4">
+${test.date}
+</p>
+
+<div class="mb-6">
+
+Score : ${test.score} / ${test.total} <br>
+Correct : ${test.correct} <br>
+Wrong : ${test.wrong}
+
+</div>
+
+`
+
+test.answers.forEach((a,i)=>{
+
+if(!a.user) return
+
+block+=`
+
+<div class="mb-6 p-4 border border-gray-700 rounded">
+
+<p class="font-bold mb-4">
+Q${i+1}. ${a.question}
+</p>
+
+`
+
+a.options.forEach((opt,idx)=>{
+
+let letter = String.fromCharCode(65+idx)
+
+let className="option"
+
+if(letter===a.correct){
+className+=" correct"
+}
+
+if(letter===a.user && a.user!==a.correct){
+className+=" wrong"
+}
+
+block+=`
+
+<div class="${className}">
+${letter}. ${opt}
+</div>
+
+`
+
+})
+
+block+=`</div>`
+
+})
+
+block+="</div>"
+
+container.innerHTML=block
+
+</script>
+
+</body>
+</html>

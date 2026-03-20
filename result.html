@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Analysis | Divya's Results</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 20% 20%, #0f172a, #020408);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            width: 90%;
+            max-width: 750px;
+            padding: 3.5rem;
+            text-align: center;
+            box-shadow: 0 60px 120px rgba(0, 0, 0, 0.6);
+            transition: 0.4s;
+        }
+
+        .main-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 80px 140px rgba(0, 0, 0, 0.8);
+        }
+
+        .serif-font { font-family: 'Playfair Display', serif; }
+
+        .score-display {
+            font-size: 6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 1.2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+        }
+
+        .stat-box:hover { transform: scale(1.05) }
+
+        .btn-action {
+            padding: 1rem 2rem;
+            border-radius: 100px;
+            font-weight: 700;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: .75rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary { background: white; color: black }
+        .btn-primary:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+        }
+
+        #statusIcon { animation: floatIcon 3s ease-in-out infinite }
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0) }
+            50% { transform: translateY(-10px) }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="main-card">
+    <div id="statusIcon" class="text-6xl mb-4">✨</div>
+    <h1 id="resultTitle" class="text-4xl font-black mb-2 serif-font italic">Analyzing...</h1>
+    <p id="resultQuote" class="text-gray-400 mb-8 text-lg">Calculating your performance...</p>
+
+    <div class="mb-8">
+        <h2 id="scoreValue" class="score-display">0</h2>
+        <p class="text-xs tracking-[0.4em] text-indigo-400 font-bold uppercase">Points Earned</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 mb-10">
+        <div class="stat-box">
+            <p class="text-[10px] text-gray-400 uppercase mb-1">Correct</p>
+            <h4 id="correct" class="text-xl font-bold text-green-400">0</h4>
+        </div>
+        <div class="stat-box">
+            <p class="text-[10px] text-gray-400 uppercase mb-1">Accuracy</p>
+            <h4 id="accuracy" class="text-xl font-bold text-indigo-300">0%</h4>
+        </div>
+        <div class="stat-box">
+            <p class="text-[10px] text-gray-400 uppercase mb-1">Wrong</p>
+            <h4 id="wrong" class="text-xl font-bold text-red-400">0</h4>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap gap-4 justify-center">
+        <button onclick="location.href='answer.html'" class="btn-action btn-primary">View Answers</button>
+        <button onclick="location.href='progress.html'" class="btn-action border border-white/10 hover:bg-white/5">Performance</button>
+        <button onclick="attemptAgain()" class="btn-action border border-indigo-400 hover:bg-indigo-500/20">Retry</button>
+        <button onclick="location.href='history.html'" class="btn-action border border-yellow-400 hover:bg-yellow-500/20">History</button>
+    </div>
+</div>
+
+<script>
+function attemptAgain() {
+    const lastSet = localStorage.getItem("lastSet") || "1";
+    window.location.href = "test.html?set=" + lastSet;
+}
+
+window.onload = () => {
+    const data = JSON.parse(localStorage.getItem('lastScore')) || {correct: 0, wrong: 0, score: 0, total: 1};
+    const score = data.score;
+    
+    const scoreEl = document.getElementById('scoreValue');
+    const titleEl = document.getElementById('resultTitle');
+    const iconEl = document.getElementById('statusIcon');
+
+    document.getElementById('correct').innerText = data.correct;
+    document.getElementById('wrong').innerText = data.wrong;
+    document.getElementById('accuracy').innerText = Math.round((data.correct / data.total) * 100) + "%";
+
+    // Score Animation
+    let count = 0;
+    const duration = 1000; // 1 second
+    const increment = Math.ceil(score / (duration / 30));
+    
+    const counter = setInterval(() => {
+        count += increment;
+        if (count >= score) {
+            scoreEl.innerText = score;
+            clearInterval(counter);
+        } else {
+            scoreEl.innerText = count;
+        }
+    }, 30);
+
+    // Dynamic Content & Confetti
+    if (score >= 70) {
+        titleEl.innerText = "Elite Victory";
+        iconEl.innerText = "👑";
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    } else if (score >= 50) {
+        titleEl.innerText = "Brilliant Effort";
+        iconEl.innerText = "✨";
+        confetti({ particleCount: 80, spread: 50 });
+    } else if (score >= 30) {
+        titleEl.innerText = "Keep Rising";
+        iconEl.innerText = "🎉";
+    } else {
+        titleEl.innerText = "The Journey Begins";
+        iconEl.innerText = "💫";
+    }
+
+    // --- SECURE HISTORY SAVE ---
+    try {
+        if (!localStorage.getItem("historySaved")) {
+            let history = JSON.parse(localStorage.getItem("examHistory")) || [];
+            const questions = JSON.parse(localStorage.getItem("lastQuestions")) || [];
+            const userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
+
+            let answers = questions.map((q, i) => ({
+                question: q.question,
+                options: q.options,
+                correct: q.answer,
+                user: userAnswers[i] || null
+            }));
+
+            history.push({
+                date: new Date().toLocaleString(),
+                score: data.score,
+                correct: data.correct,
+                wrong: data.wrong,
+                total: data.total,
+                answers: answers
+            });
+
+            localStorage.setItem("examHistory", JSON.stringify(history));
+            localStorage.setItem("historySaved", "true");
+        }
+    } catch (e) {
+        console.log("History Save Error:", e);
+    }
+}
+</script>
+
+</body>
+</html>

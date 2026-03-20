@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEET Pro | Elite Testing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="questions.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        :root { --cream: #FFFDF5; --primary: #6366f1; --dark: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--cream); color: var(--dark); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .nav-blur { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); padding: 12px 20px; z-index: 100; }
+        .timer-badge { background: #1e293b; color: #fff; padding: 8px 18px; border-radius: 100px; font-weight: 800; font-size: 13px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .test-container { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; }
+        .q-card { background: white; border-radius: 35px; padding: 35px; max-width: 800px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 20px 50px rgba(0,0,0,0.02); }
+        .opt-pill { padding: 20px 25px; border-radius: 20px; border: 2px solid #f1f5f9; background: white; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.25s; font-weight: 600; }
+        .opt-pill.selected { background: #eff6ff; border-color: var(--primary); color: var(--primary); transform: scale(1.01); }
+        .opt-letter { width: 32px; height: 32px; border-radius: 10px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #64748b; }
+        .selected .opt-letter { background: var(--primary); color: white; }
+        .map-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 40px 40px 0 0; box-shadow: 0 -30px 60px rgba(0,0,0,0.15); transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); z-index: 1001; padding: 30px; }
+        .map-drawer.active { bottom: 0; }
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1000; }
+        .drawer-overlay.active { opacity: 1; visibility: visible; }
+        .q-dot { width: 48px; height: 48px; border-radius: 16px; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; border: 1px solid #e2e8f0; }
+        .q-dot.done { background: #10b981; color: white; border: none; }
+        .q-dot.rev { background: #8b5cf6; color: white; border: none; }
+        .q-dot.curr { border: 3px solid var(--dark); background: white; }
+        .action-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #1e293b; border-radius: 25px; padding: 10px; display: flex; gap: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); z-index: 999; }
+        .btn-icon { flex: 1; padding: 12px; border-radius: 18px; color: white; font-weight: 800; font-size: 9px; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .btn-next { background: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="drawer-overlay" id="overlay" onclick="toggleMap()"></div>
+
+<nav class="nav-blur flex justify-between items-center">
+    <div onclick="toggleMap()" class="flex items-center gap-3 cursor-pointer">
+        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600"><i class="fas fa-layer-group"></i></div>
+        <div>
+            <p class="text-[9px] font-black text-slate-400 tracking-[2px]">INDEX</p>
+            <p class="text-xs font-black">Q. <span id="qDisplay">01</span>/<span id="totalDisplay">00</span></p>
+        </div>
+    </div>
+    <div class="timer-badge" id="timer">25:00</div>
+    <button onclick="submitTest()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black tracking-widest">SUBMIT</button>
+</nav>
+
+<main class="test-container">
+    <div class="text-center mb-8">
+        <span id="sectionLabel" class="bg-amber-100 text-amber-700 text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest">Section</span>
+    </div>
+    <div class="q-card">
+        <h2 id="qText" class="text-xl font-bold leading-relaxed mb-10 text-slate-800 italic">Loading...</h2>
+        <div id="options" class="opt-container"></div>
+    </div>
+</main>
+
+<div class="action-bar">
+    <button onclick="mark()" class="btn-icon"><i class="fas fa-bookmark text-purple-400"></i>Mark</button>
+    <button onclick="clearAns()" class="btn-icon"><i class="fas fa-eraser text-slate-400"></i>Clear</button>
+    <button onclick="nextQ()" class="btn-icon btn-next"><i class="fas fa-chevron-right"></i>Save & Next</button>
+</div>
+
+<div class="map-drawer" id="mapDrawer">
+    <div class="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6" onclick="toggleMap()"></div>
+    <div id="palette" class="grid grid-cols-5 gap-4 overflow-y-auto max-h-[400px] pb-10"></div>
+</div>
+
+<script>
+// FILTER LOGIC
+const cls = localStorage.getItem("selectedClass");
+const sub = localStorage.getItem("selectedSubject");
+const chap = localStorage.getItem("selectedChapter");
+const shift = localStorage.getItem("selectedShift");
+
+let questions = allQuestions.filter(q => q.class === cls && q.subject === sub && q.chapter === chap && q.shift === shift);
+
+if(questions.length === 0) {
+    alert("Bhai, is category mein questions nahi mile!");
+    window.location.href = "sets.html";
+}
+
+let current = 0;
+let timeLeft = 25 * 60;
+let answers = new Array(questions.length).fill(null);
+let status = new Array(questions.length).fill('not');
+
+document.getElementById("totalDisplay").innerText = questions.length;
+document.getElementById("sectionLabel").innerText = `Section: ${sub || 'Biology'}`;
+
+// FIX 1: Secure Timer
+function startTimer() {
+    const timerInterval = setInterval(() => {
+        if(timeLeft <= 0){
+            clearInterval(timerInterval);
+            submitTest(true); // Auto-submit on time up
+            return;
+        }
+        timeLeft--;
+        let m = Math.floor(timeLeft/60);
+        let s = timeLeft%60;
+        document.getElementById("timer").innerText = `${m}:${s<10?'0':''}${s}`;
+    }, 1000);
+}
+
+function render() {
+    let q = questions[current];
+    document.getElementById("qDisplay").innerText = (current + 1).toString().padStart(2, '0');
+    document.getElementById("qText").innerText = q.question;
+    let optDiv = document.getElementById("options");
+    optDiv.innerHTML = "";
+    q.options.forEach((op, i) => {
+        let letter = String.fromCharCode(65 + i);
+        let isSelected = answers[current] === letter;
+        optDiv.innerHTML += `
+            <div class="opt-pill ${isSelected ? 'selected' : ''}" onclick="select('${letter}')">
+                <div class="opt-letter">${letter}</div>
+                <span>${op}</span>
+            </div>`;
+    });
+    renderPalette();
+}
+
+function select(val) {
+    answers[current] = val;
+    status[current] = "answered";
+    render();
+}
+
+// FIX 3: Last Question UX
+function nextQ() {
+    if(answers[current] === null && status[current] !== "marked") {
+        status[current] = "not-answered";
+    }
+
+    if(current < questions.length - 1) {
+        current++;
+        render();
+    } else {
+        alert("Bhai, ye last question tha! Ab map se check kar lo ya Submit karo.");
+        toggleMap();
+    }
+}
+
+// FIX 4: Mark Logic (Consistent)
+function mark() {
+    status[current] = "marked";
+    nextQ();
+}
+
+function clearAns() {
+    answers[current] = null;
+    status[current] = "not";
+    render();
+}
+
+function renderPalette() {
+    let p = document.getElementById("palette");
+    p.innerHTML = "";
+    status.forEach((s, i) => {
+        let cls = "q-dot";
+        if(s === "answered") cls += " done";
+        if(s === "marked") cls += " rev";
+        if(i === current) cls += " curr";
+        p.innerHTML += `<div class="${cls}" onclick="jump(${i})">${i+1}</div>`;
+    });
+}
+
+// FIX 5: Jump UX Status Update
+function jump(i) {
+    if(status[current] === "not") {
+        status[current] = "not-answered";
+    }
+    current = i;
+    render();
+    toggleMap();
+}
+
+function toggleMap() {
+    document.getElementById("mapDrawer").classList.toggle("active");
+    document.getElementById("overlay").classList.toggle("active");
+}
+
+// FIX 2: History Save Logic & Scoring
+function submitTest(isAuto = false) {
+    if(isAuto || confirm("Final submission kar dein?")) {
+        let correct = 0, wrong = 0;
+        answers.forEach((ans, i) => {
+            if(ans !== null) {
+                if(ans === questions[i].answer) correct++;
+                else wrong++;
+            }
+        });
+
+        const score = (correct * 4) - (wrong * 1);
+
+        localStorage.setItem("lastScore", JSON.stringify({
+            correct: correct,
+            wrong: wrong,
+            score: score,
+            total: questions.length
+        }));
+        
+        localStorage.setItem("userAnswers", JSON.stringify(answers));
+        localStorage.setItem("lastQuestions", JSON.stringify(questions));
+        
+        // Very Important: Enable history saving for result.html
+        localStorage.setItem("historySaved", "false"); 
+
+        window.location.href = "result.html";
+    }
+}
+
+startTimer();
+render();
+</script>
+
+</body>
+</html>

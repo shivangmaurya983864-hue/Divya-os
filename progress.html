@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEET Pro | Advanced Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .stat-card { background: white; border-radius: 20px; padding: 24px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 18px; }
+        .chart-container { background: white; border-radius: 24px; padding: 28px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.03); }
+        .back-btn { display: flex; align-items: center; gap: 8px; color: #64748b; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-bottom: 20px; }
+        .back-btn:hover { color: #4f46e5; transform: translateX(-5px); }
+    </style>
+</head>
+<body class="p-6 md:p-10">
+
+    <div class="max-w-7xl mx-auto">
+        <a href="result.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Result
+        </a>
+
+        <div class="mb-10 flex flex-wrap justify-between items-end gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-slate-900">Performance Dashboard</h1>
+                <p class="text-slate-500 font-medium mt-1">Deep insights into your learning journey</p>
+            </div>
+            <button onclick="clearHistory()" class="text-[10px] font-black tracking-widest text-red-500 bg-red-50 px-6 py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300">
+                RESET ANALYTICS
+            </button>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div class="stat-card">
+                <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 text-xl"><i class="fas fa-fire"></i></div>
+                <div><p class="text-3xl font-black" id="totalTests">0</p><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tests Taken</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 text-xl"><i class="fas fa-bullseye"></i></div>
+                <div><p class="text-3xl font-black" id="avgScore">0%</p><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg. Accuracy</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-xl"><i class="fas fa-check-circle"></i></div>
+                <div><p class="text-3xl font-black" id="correctAns">0</p><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Correct</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 text-xl"><i class="fas fa-times-circle"></i></div>
+                <div><p class="text-3xl font-black" id="totalWrong">0</p><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Wrong</p></div>
+            </div>
+        </div>
+
+        <!-- Main Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+            <div class="chart-container flex flex-col items-center justify-center relative min-h-[400px]">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 self-start">Accuracy Split</h3>
+                <div class="w-full h-64 relative">
+                    <canvas id="gaugeChart"></canvas>
+                    <div class="absolute inset-0 flex items-center justify-center flex-col">
+                        <span class="text-5xl font-black text-slate-800" id="centerScore">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container lg:col-span-2 min-h-[400px]">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Progress Velocity</h3>
+                <div class="h-64"><canvas id="lineChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Bottom Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="chart-container lg:col-span-2">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Question Analysis (Stacked)</h3>
+                <div class="h-64"><canvas id="barChart"></canvas></div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Hall of Fame 🏆</h3>
+                <div id="topScores" class="space-y-4">
+                    <!-- Leaderboard injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let history = JSON.parse(localStorage.getItem("examHistory")) || [];
+
+        // FIX 1: Safe Logic for Metrics (NaN Prevention)
+        let totalCorrect = history.reduce((s, t) => s + (t.correct || 0), 0);
+        let totalWrong = history.reduce((s, t) => s + (t.wrong || 0), 0);
+        let totalAttempted = history.reduce((s, t) => s + (t.total || 0), 0);
+
+        let avgAcc = history.length 
+            ? Math.round(history.reduce((s, t) => {
+                let acc = t.total ? (t.correct / t.total) * 100 : 0;
+                return s + acc;
+            }, 0) / history.length) 
+            : 0;
+
+        // UI Updates
+        document.getElementById("totalTests").innerText = history.length;
+        document.getElementById("correctAns").innerText = totalCorrect;
+        document.getElementById("totalWrong").innerText = totalWrong;
+        document.getElementById("avgScore").innerText = avgAcc + "%";
+        document.getElementById("centerScore").innerText = avgAcc + "%";
+
+        // Chart Data Preparation
+        const labels = history.length ? history.map((t, i) => t.date ? t.date.split(',')[0] : ("T" + (i + 1))) : ['-'];
+        const accuracyData = history.length ? history.map(t => t.total ? Math.round((t.correct / t.total) * 100) : 0) : [0];
+        
+        // FIX 2: Safe Chart Data Arrays
+        const safeCorrect = history.length ? history.map(t => t.correct) : [0];
+        const safeWrong = history.length ? history.map(t => t.wrong) : [0];
+
+        // 1. Doughnut Chart
+        new Chart(document.getElementById('gaugeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Correct', 'Wrong'],
+                datasets: [{
+                    data: [totalCorrect || 1, totalWrong || 0],
+                    backgroundColor: ['#10b981', '#f43f5e'],
+                    borderWidth: 0,
+                    cutout: '82%',
+                    borderRadius: 10
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        // 2. Line Chart (Progress)
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Accuracy %',
+                    data: accuracyData,
+                    borderColor: '#6366f1',
+                    backgroundGradient: 'linear-gradient(to bottom, #6366f1, #fff)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#6366f1',
+                    pointBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, max: 100, grid: { borderDash: [5, 5] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 3. Bar Chart (Daily Analysis)
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Correct', data: safeCorrect, backgroundColor: '#10b981', borderRadius: 5 },
+                    { label: 'Wrong', data: safeWrong, backgroundColor: '#f43f5e', borderRadius: 5 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { 
+                    x: { stacked: true, grid: { display: false } }, 
+                    y: { stacked: true, grid: { borderDash: [5, 5] } } 
+                },
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // FIX 3: Safe Leaderboard Logic
+        const topScoresDiv = document.getElementById("topScores");
+        if (history.length === 0) {
+            topScoresDiv.innerHTML = `<div class="text-center py-10"><i class="fas fa-chart-line text-slate-200 text-4xl mb-4"></i><p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No Tests Taken Yet</p></div>`;
+        } else {
+            const sorted = [...history]
+                .sort((a, b) => {
+                    let accA = a.total ? (a.correct / a.total) : 0;
+                    let accB = b.total ? (b.correct / b.total) : 0;
+                    return accB - accA;
+                })
+                .slice(0, 4);
+
+            sorted.forEach((t, idx) => {
+                let acc = t.total ? Math.round((t.correct / t.total) * 100) : 0;
+                let colors = ['bg-yellow-100 text-yellow-700', 'bg-slate-100 text-slate-700', 'bg-orange-100 text-orange-700', 'bg-blue-100 text-blue-700'];
+                topScoresDiv.innerHTML += `
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 transition-hover hover:shadow-md">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full ${colors[idx] || colors[3]} flex items-center justify-center font-black text-xs">${idx + 1}</span>
+                            <span class="font-bold text-xs text-slate-600">${t.date ? t.date.split(',')[0] : 'Test Session'}</span>
+                        </div>
+                        <span class="text-indigo-600 font-black text-sm">${acc}%</span>
+                    </div>`;
+            });
+        }
+
+        // RESET ALL DATA
+        function clearHistory() {
+            if (confirm("🚨 Dangerous Move! Ye tumhara saara progress mita dega. Continue?")) {
+                localStorage.removeItem("examHistory");
+                localStorage.removeItem("historySaved");
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

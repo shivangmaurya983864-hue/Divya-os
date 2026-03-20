@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queen's Academy | NEET Full Syllabus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #FFFDF5; 
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .nav-glass {
+            background: rgba(255, 253, 245, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .class-tab {
+            padding: 10px 25px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+        .active-class { background: #1e293b; color: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .inactive-class { background: #F5F2E8; color: #94a3b8; }
+
+        .sub-pill {
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .chapter-box {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+        }
+
+        .chapter-box:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.1);
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+
+        .weightage-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            color: inherit;
+            font-size: 9px;
+            padding: 5px 12px;
+            border-radius: 100px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        #shiftOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .shift-card {
+            background: #fff;
+            border-radius: 35px;
+            padding: 35px;
+            text-align: center;
+            width: 100%;
+            max-width: 320px;
+            transition: 0.3s;
+        }
+
+        .morning-btn { background: linear-gradient(135deg, #FF9933, #FFCC33); color: #432; }
+        .night-btn { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; }
+
+    </style>
+</head>
+<body>
+
+<div id="shiftOverlay" onclick="closeShift()">
+    <div class="flex flex-col gap-6 w-full items-center" onclick="event.stopPropagation()">
+        <h2 id="targetChapter" class="text-white text-3xl font-black mb-4 text-center">Chapter Name</h2>
+        
+        <div class="shift-card morning-btn" onclick="startStudy('Morning')">
+            <i class="fas fa-sun text-5xl mb-4"></i>
+            <h3 class="text-2xl font-black">MORNING SHIFT</h3>
+            <p class="text-[10px] font-bold opacity-70 uppercase tracking-widest">Deep Focus Mode</p>
+        </div>
+
+        <div class="shift-card night-btn" onclick="startStudy('Night')">
+            <i class="fas fa-moon text-5xl mb-4"></i>
+            <h3 class="text-2xl font-black text-white">NIGHT SHIFT</h3>
+            <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Smart Revision</p>
+        </div>
+
+        <button onclick="closeShift()" class="text-white/40 uppercase tracking-widest text-[10px] mt-4 font-black">← Close Menu</button>
+    </div>
+</div>
+
+<nav class="nav-glass p-5">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <a href="index.html" class="text-[10px] font-black text-slate-400 hover:text-black tracking-[2px]">← BACK</a>
+        <div class="flex gap-2 p-1 bg-[#F5F2E8] rounded-2xl">
+            <button id="btn11" onclick="setClass('11th')" class="class-tab active-class">CLASS 11</button>
+            <button id="btn12" onclick="setClass('12th')" class="class-tab inactive-class">CLASS 12</button>
+        </div>
+        <div class="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden">
+            <img src="divya.jpg" class="w-full h-full object-cover">
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-6xl mx-auto p-8">
+    <div class="text-center mb-16">
+        <h1 class="text-5xl font-black tracking-tighter text-slate-900 mb-3">Study Arena</h1>
+        <p class="text-slate-500 text-sm font-medium">Divya, choose your mission for today! 🚀</p>
+    </div>
+
+    <div class="flex justify-center gap-4 mb-12 overflow-x-auto pb-4 no-scrollbar">
+        <div id="pillBio" onclick="setSub('Biology')" class="sub-pill bg-emerald-100 text-emerald-700 border-2 border-emerald-500">Biology 🧬</div>
+        <div id="pillPhy" onclick="setSub('Physics')" class="sub-pill bg-slate-100 text-slate-400 border-2 border-transparent">Physics 📘</div>
+        <div id="pillChem" onclick="setSub('Chemistry')" class="sub-pill bg-slate-100 text-slate-400 border-2 border-transparent">Chemistry ⚛️</div>
+    </div>
+
+    <div id="chaptersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Dynamic Cards Here -->
+    </div>
+</main>
+
+<script>
+let selectedClass = "11th";
+let selectedSubject = "Biology";
+
+const fullSyllabus = {
+    "11th": {
+        "Biology": [
+            {n: "The Living World", e: "🌍", c: "#E0F2FE", t: "#0369a1"}, 
+            {n: "Biological Classification", e: "🧬", c: "#F0FDF4", t: "#15803d"}, 
+            {n: "Plant Kingdom", e: "🌸", c: "#FEF2F2", t: "#b91c1c"}, 
+            {n: "Animal Kingdom", e: "🐾", c: "#FFF7ED", t: "#c2410c"}, 
+            {n: "Morphology of Flowering Plants", e: "🧫", c: "#F5F3FF", t: "#6d28d9"}, 
+            {n: "Anatomy of Flowering Plants", e: "🌿", c: "#ECFEFF", t: "#0e7490"}, 
+            {n: "Structural Organisation in Animals", e: "🐸", c: "#FDF2F8", t: "#be185d"}, 
+            {n: "Cell: Unit of Life", e: "🔬", c: "#ECFEFF", t: "#0e7490", w: "V. Important"},
+            {n: "Biomolecules", e: "⚙️", c: "#FDF2F8", t: "#be185d", w: "Important"}, 
+            {n: "Cell Cycle & Cell Division", e: "🔄", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Transport in Plants", e: "🌾", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Mineral Nutrition", e: "🌧️", c: "#FEFCE8", t: "#a16207"}, 
+            {n: "Photosynthesis in Higher Plants", e: "🌿", c: "#EEF2FF", t: "#4338ca"}, 
+            {n: "Respiration in Plants", e: "🌬️", "c": "#F0FDF4", t: "#15803d"}, 
+            {n: "Plant Growth & Development", e: "🌱", c: "#FEF2F2", t: "#b91c1c"}, 
+            {n: "Digestion & Absorption", e: "🩸", c: "#FFF7ED", t: "#c2410c"}, 
+            {n: "Breathing & Exchange of Gases", e: "💨", c: "#F5F3FF", t: "#6d28d9"}, 
+            {n: "Body Fluids & Circulation", e: "❤️", c: "#ECFEFF", t: "#0e7490"}, 
+            {n: "Excretory Products & Elimination", e: "🚽", c: "#FDF2F8", t: "#be185d"}, 
+            {n: "Locomotion & Movement", e: "🦴", c: "#F0FDFA", t: "#0f766e"}, 
+            {n: "Neural Control & Coordination", e: "🧠", c: "#F0FDFA", t: "#0f766e"}, 
+            {n: "Chemical Coordination", e: "🧪", c: "#F1F5F9", t: "#334155"}
+        ],
+        "Physics": [
+            {n: "Units & Measurements", e: "📐", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Motion in a Straight Line", e: "➡️", c: "#FEFCE8", t: "#a16207"}, 
+            {n: "Motion in a Plane", e: "🔄", c: "#EEF2FF", t: "#4338ca"}, 
+            {n: "Laws of Motion", e: "⚡", c: "#FEFCE8", t: "#a16207", w: "High Weightage"},
+            {n: "Work, Energy & Power", e: "🔋", c: "#F0FDF4", t: "#15803d", w: "Important"}, 
+            {n: "System of Particles (Rotation)", e: "🔄", c: "#FEF2F2", t: "#b91c1c", w: "V. Important"}, 
+            {n: "Gravitation", e: "🌍", c: "#EEF2FF", t: "#4338ca"}, 
+            {n: "Mechanical Prop. of Solids", e: "🌡️", c: "#F5F3FF", t: "#6d28d9"}, 
+            {n: "Mechanical Prop. of Fluids", e: "💧", c: "#ECFEFF", t: "#0e7490"}, 
+            {n: "Thermal Prop. of Matter", e: "🌡️", c: "#FFF7ED", t: "#c2410c"}, 
+            {n: "Thermodynamics", e: "🔥", c: "#FDF2F8", t: "#be185d"}, 
+            {n: "Kinetic Theory", e: "⚡", c: "#F0FDFA", t: "#0f766e"}, 
+            {n: "Oscillations", e: "🌊", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Waves", e: "🌊", c: "#E0F2FE", t: "#0369a1", w: "Important"}
+        ],
+        "Chemistry": [
+            {n: "Some Basic Concepts", e: "⚛️", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Structure of Atom", e: "⚖️", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Classification of Elements", e: "🧬", c: "#FEF2F2", t: "#b91c1c"}, 
+            {n: "Chemical Bonding", e: "⚛️", c: "#F0FDF4", t: "#15803d", w: "V. Important"}, 
+            {n: "States of Matter", e: "🔄", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Thermodynamics", e: "🔥", c: "#FEFCE8", t: "#a16207"}, 
+            {n: "Equilibrium", e: "⚡", c: "#EEF2FF", t: "#4338ca"}, 
+            {n: "Redox Reactions", e: "🧮", c: "#F5F3FF", t: "#6d28d9"}, 
+            {n: "s-Block Elements", e: "🧪", c: "#FFF7ED", t: "#c2410c"}, 
+            {n: "p-Block Elements (13 & 14)", e: "🧪", c: "#ECFEFF", t: "#0e7490"}, 
+            {n: "Organic Chem: Basic Principles", e: "🧪", c: "#FDF2F8", t: "#be185d"}, 
+            {n: "Hydrocarbons", e: "🔗", c: "#F0FDFA", t: "#0f766e"}, 
+            {n: "Environmental Chemistry", e: "🧫", c: "#F0FDF4", t: "#15803d"}
+        ]
+    },
+    "12th": {
+        "Biology": [
+            {n: "Sexual Reproduction in Plants", e: "👶", c: "#F0FDF4", t: "#15803d"}, 
+            {n: "Human Reproduction", e: "🧑‍🤝‍🧑", c: "#FEF2F2", t: "#b91c1c"}, 
+            {n: "Reproductive Health", e: "⚠️", c: "#FFF7ED", t: "#c2410c"}, 
+            {n: "Principles of Inheritance", e: "🧬", c: "#F0FDF4", t: "#15803d", w: "High Weightage"}, 
+            {n: "Molecular Basis of Inheritance", e: "🧪", c: "#F5F3FF", t: "#6d28d9", w: "V. Important"}, 
+            {n: "Evolution", e: "🧬", c: "#ECFEFF", t: "#0e7490"}, 
+            {n: "Human Health & Disease", e: "🧫", c: "#FDF2F8", t: "#be185d"}, 
+            {n: "Strategies for Food Production", e: "🍞", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Microbes in Human Welfare", e: "🧪", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Biotechnology: Principles", e: "🧬", c: "#FEFCE8", t: "#a16207"}, 
+            {n: "Biotechnology & Applications", e: "🧪", c: "#EEF2FF", t: "#4338ca"}, 
+            {n: "Organisms & Populations", e: "🌍", c: "#F0FDFA", t: "#0f766e"}, 
+            {n: "Ecosystem", e: "🌱", c: "#FEF2F2", t: "#b91c1c"}, 
+            {n: "Biodiversity & Conservation", e: "🌏", c: "#FFF7ED", t: "#c2410c"}, 
+            {n: "Environmental Issues", e: "🚫", c: "#F5F3FF", t: "#6d28d9"}
+        ],
+        "Physics": [
+            {n: "Electric Charges & Fields", e: "⚡", c: "#E0F2FE", t: "#0369a1", w: "Important"}, 
+            {n: "Electrostatic Potential", e: "🔋", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Current Electricity", e: "⚡", c: "#FEFCE8", t: "#a16207", w: "V. Important"}, 
+            {n: "Moving Charges & Magnetism", e: "🧲", c: "#EEF2FF", t: "#4338ca"}, 
+            {n: "Magnetism & Matter", e: "🧲", c: "#F0FDF4", t: "#15803d"}, 
+            {n: "Electromagnetic Induction", e: "🔄", c: "#FEF2F2", t: "#b91c1c", w: "Important"}, 
+            {n: "Alternating Current", e: "📡", c: "#FFF7ED", t: "#c2410c"}, 
+            {n: "Electromagnetic Waves", e: "🌊", c: "#F5F3FF", t: "#6d28d9"}, 
+            {n: "Ray Optics", e: "💡", c: "#ECFEFF", t: "#0e7490", w: "High Weightage"}, 
+            {n: "Wave Optics", e: "🌈", c: "#FDF2F8", t: "#be185d"}, 
+            {n: "Dual Nature of Matter", e: "⚛️", c: "#F0FDFA", t: "#0f766e"}, 
+            {n: "Atoms", e: "🧬", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Nuclei", e: "⚛️", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Semiconductors", e: "💻", c: "#E0F2FE", t: "#0369a1", w: "Important"}
+        ],
+        "Chemistry": [
+            {n: "Solid State", e: "🔄", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Solutions", e: "💧", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Electrochemistry", e: "⚡", c: "#F5F3FF", t: "#6d28d9", w: "Important"}, 
+            {n: "Chemical Kinetics", e: "⏱️", c: "#FEFCE8", t: "#a16207"}, 
+            {n: "Surface Chemistry", e: "⚖️", c: "#EEF2FF", t: "#4338ca"}, 
+            {n: "p-Block Elements (15-18)", e: "🧪", c: "#ECFEFF", t: "#0e7490", w: "Important"}, 
+            {n: "d & f Block Elements", e: "⚛️", c: "#F0FDFA", t: "#0f766e"}, 
+            {n: "Coordination Compounds", e: "🧪", c: "#FDF2F8", t: "#be185d", w: "Important"}, 
+            {n: "Haloalkanes & Haloarenes", e: "🔗", c: "#F0FDF4", t: "#15803d"}, 
+            {n: "Alcohols, Phenols & Ethers", e: "🍺", c: "#FEF2F2", t: "#b91c1c"}, 
+            {n: "Aldehydes, Ketones & Acids", e: "🧪", c: "#FFF7ED", t: "#c2410c", w: "Important"}, 
+            {n: "Amines", e: "💊", c: "#E0F2FE", t: "#0369a1"}, 
+            {n: "Organic Chemistry", e: "🧪", c: "#FDF2F8", t: "#be185d", w: "King of Chem"}, 
+            {n: "Biomolecules", e: "💊", c: "#FFFBEB", t: "#b45309"}, 
+            {n: "Polymers", e: "🧴", c: "#F1F5F9", t: "#334155"}, 
+            {n: "Chemistry in Everyday Life", e: "🧼", c: "#F0FDFA", t: "#0f766e"}
+        ]
+    }
+};
+
+function setClass(c) {
+    selectedClass = c;
+    document.getElementById('btn11').className = c === '11th' ? 'class-tab active-class' : 'class-tab inactive-class';
+    document.getElementById('btn12').className = c === '12th' ? 'class-tab active-class' : 'class-tab inactive-class';
+    renderChapters();
+}
+
+function setSub(s) {
+    selectedSubject = s;
+
+    // 🔥 FIXED: Tailwind Dynamic Color Classes
+    const styles = {
+        'Biology': "bg-emerald-100 text-emerald-700 border-emerald-500",
+        'Physics': "bg-indigo-100 text-indigo-700 border-indigo-500",
+        'Chemistry': "bg-amber-100 text-amber-700 border-amber-500"
+    };
+
+    ['pillBio', 'pillPhy', 'pillChem'].forEach(id => {
+        document.getElementById(id).className = "sub-pill bg-slate-100 text-slate-400 border-2 border-transparent";
+    });
+
+    const activeId = s === 'Biology' ? 'pillBio' : s === 'Physics' ? 'pillPhy' : 'pillChem';
+    
+    // Apply the fixed styles
+    document.getElementById(activeId).className = `sub-pill border-2 ${styles[s]}`;
+    
+    renderChapters();
+}
+
+function renderChapters() {
+    const grid = document.getElementById('chaptersGrid');
+    grid.innerHTML = "";
+    const chapters = fullSyllabus[selectedClass][selectedSubject];
+    
+    chapters.forEach(ch => {
+        const card = document.createElement('div');
+        card.className = "chapter-box";
+        card.style.backgroundColor = ch.c;
+        card.style.color = ch.t;
+        card.onclick = () => openShift(ch.n);
+        
+        card.innerHTML = `
+            ${ch.w ? `<span class="weightage-tag">${ch.w}</span>` : ''}
+            <div class="icon-circle">${ch.e}</div>
+            <h3 class="font-black text-xl leading-tight mb-2">${ch.n}</h3>
+            <p class="text-[10px] opacity-60 font-bold uppercase tracking-widest">Neet Exam Prep</p>
+            <div class="mt-8 flex justify-between items-center opacity-40 group">
+                <span class="text-[9px] font-black uppercase tracking-[2px]">Enter Mission</span>
+                <i class="fas fa-arrow-right text-sm"></i>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function openShift(name) {
+    document.getElementById('targetChapter').innerText = name;
+    document.getElementById('shiftOverlay').style.display = 'flex';
+}
+
+function closeShift() { document.getElementById('shiftOverlay').style.display = 'none'; }
+
+// 🔥 FIXED: ESC Key to close overlay
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeShift();
+});
+
+function startStudy(mode){
+    const chapter = document.getElementById('targetChapter').innerText;
+
+    // 🔥 FIXED: Dynamic Class & Subject Selection Logic
+    const clsValue = selectedClass === "11th" ? "11" : "12";
+
+    localStorage.setItem("selectedClass", clsValue);
+    localStorage.setItem("selectedSubject", selectedSubject);
+    localStorage.setItem("selectedChapter", chapter);
+    localStorage.setItem("selectedShift", mode);
+
+    window.location.href = "test.html";
+}
+
+renderChapters();
+</script>
+</body>
+</html>
