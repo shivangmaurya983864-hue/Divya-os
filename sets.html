@@ -17,6 +17,67 @@
             color: #1e293b;
         }
 
+        /* --- ID CARD MODAL STYLES --- */
+        #idCardOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .medical-id {
+            background: white;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 45px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.4);
+            animation: cardEntrance 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: scale(0.8) translateY(40px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .id-header {
+            background: #1e293b;
+            padding: 45px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .id-photo-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 40px;
+            border: 6px solid white;
+            margin: -60px auto 20px;
+            overflow: hidden;
+            background: #eee;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .doctor-label {
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 5px 15px;
+            border-radius: 100px;
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            letter-spacing: 1.5px;
+        }
+
+        /* --- PREVIOUS STYLES --- */
         .nav-glass {
             background: rgba(255, 253, 245, 0.8);
             backdrop-filter: blur(15px);
@@ -26,117 +87,86 @@
             z-index: 100;
         }
 
-        .class-tab {
-            padding: 10px 25px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 12px;
-            transition: 0.3s;
-        }
+        .class-tab { padding: 10px 25px; border-radius: 12px; font-weight: 800; font-size: 12px; transition: 0.3s; }
         .active-class { background: #1e293b; color: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .inactive-class { background: #F5F2E8; color: #94a3b8; }
 
-        .sub-pill {
-            padding: 8px 20px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .sub-pill { padding: 8px 20px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.3s; }
 
         .chapter-box {
-            background: white;
-            border-radius: 30px;
-            padding: 25px;
-            border: 1px solid rgba(0,0,0,0.03);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            background: white; border-radius: 30px; padding: 25px; border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative;
+            overflow: hidden; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
         }
+        .chapter-box:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 30px 60px -15px rgba(0,0,0,0.1); }
 
-        .chapter-box:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.1);
-        }
+        .icon-circle { width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.9); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
 
-        .icon-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-        }
+        .weightage-tag { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); color: inherit; font-size: 9px; padding: 5px 12px; border-radius: 100px; font-weight: 900; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.3); }
 
-        .weightage-tag {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            color: inherit;
-            font-size: 9px;
-            padding: 5px 12px;
-            border-radius: 100px;
-            font-weight: 900;
-            text-transform: uppercase;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        #shiftOverlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .shift-card {
-            background: #fff;
-            border-radius: 35px;
-            padding: 35px;
-            text-align: center;
-            width: 100%;
-            max-width: 320px;
-            transition: 0.3s;
-        }
-
+        #shiftOverlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .shift-card { background: #fff; border-radius: 35px; padding: 35px; text-align: center; width: 100%; max-width: 320px; transition: 0.3s; }
         .morning-btn { background: linear-gradient(135deg, #FF9933, #FFCC33); color: #432; }
         .night-btn { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; }
 
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
+<!-- MEDICAL ID CARD MODAL -->
+<div id="idCardOverlay" onclick="closeID()">
+    <div class="medical-id" onclick="event.stopPropagation()">
+        <div class="id-header">
+            <div class="doctor-label text-white">FUTURE DR.</div>
+            <h4 class="text-[11px] font-black tracking-[3px] opacity-70">QUEEN'S ACADEMY</h4>
+            <h2 class="text-sm font-bold mt-1">MEDICAL DIVISION</h2>
+        </div>
+        
+        <div class="id-photo-container">
+            <img src="divya.jpg" class="w-full h-full object-cover">
+        </div>
+
+        <div class="px-10 pb-12 text-center">
+            <h1 class="text-3xl font-black text-slate-900 mb-1">Divya Maurya</h1>
+            <p class="text-indigo-600 font-black text-[10px] tracking-widest uppercase mb-8">MBBS Aspirant • Batch 2026</p>
+            
+            <div class="space-y-4 border-t border-slate-100 pt-8 text-left">
+                <div class="flex justify-between">
+                    <span class="text-[9px] font-black text-slate-400 uppercase">Father</span>
+                    <span class="text-[13px] font-bold text-slate-700">Mr. Akhilesh Maurya</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[9px] font-black text-slate-400 uppercase">Mother</span>
+                    <span class="text-[13px] font-bold text-slate-700">Mrs. Mira Devi</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] font-black text-slate-400 uppercase">Mission</span>
+                    <span class="text-sm font-black text-emerald-600">AIIMS DELHI / 720</span>
+                </div>
+            </div>
+
+            <div class="mt-10 p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <p class="text-[9px] font-bold text-slate-400 tracking-wider">ID VERIFIED: 2026-NEET-PRIME</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SHIFT OVERLAY -->
 <div id="shiftOverlay" onclick="closeShift()">
     <div class="flex flex-col gap-6 w-full items-center" onclick="event.stopPropagation()">
         <h2 id="targetChapter" class="text-white text-3xl font-black mb-4 text-center">Chapter Name</h2>
-        
         <div class="shift-card morning-btn" onclick="startStudy('Morning')">
             <i class="fas fa-sun text-5xl mb-4"></i>
             <h3 class="text-2xl font-black">MORNING SHIFT</h3>
             <p class="text-[10px] font-bold opacity-70 uppercase tracking-widest">Deep Focus Mode</p>
         </div>
-
         <div class="shift-card night-btn" onclick="startStudy('Night')">
             <i class="fas fa-moon text-5xl mb-4"></i>
             <h3 class="text-2xl font-black text-white">NIGHT SHIFT</h3>
             <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Smart Revision</p>
         </div>
-
         <button onclick="closeShift()" class="text-white/40 uppercase tracking-widest text-[10px] mt-4 font-black">← Close Menu</button>
     </div>
 </div>
@@ -148,7 +178,8 @@
             <button id="btn11" onclick="setClass('11th')" class="class-tab active-class">CLASS 11</button>
             <button id="btn12" onclick="setClass('12th')" class="class-tab inactive-class">CLASS 12</button>
         </div>
-        <div class="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden">
+        <!-- Tap/Double Tap Photo to Open ID -->
+        <div onclick="openID()" class="w-12 h-12 rounded-full border-4 border-white shadow-xl overflow-hidden cursor-pointer hover:scale-110 active:scale-95 transition-all">
             <img src="divya.jpg" class="w-full h-full object-cover">
         </div>
     </div>
@@ -288,6 +319,15 @@ const fullSyllabus = {
     }
 };
 
+// ID CARD FUNCTIONS
+function openID() {
+    document.getElementById('idCardOverlay').style.display = 'flex';
+}
+
+function closeID() {
+    document.getElementById('idCardOverlay').style.display = 'none';
+}
+
 function setClass(c) {
     selectedClass = c;
     document.getElementById('btn11').className = c === '11th' ? 'class-tab active-class' : 'class-tab inactive-class';
@@ -297,23 +337,16 @@ function setClass(c) {
 
 function setSub(s) {
     selectedSubject = s;
-
-    // 🔥 FIXED: Tailwind Dynamic Color Classes
     const styles = {
         'Biology': "bg-emerald-100 text-emerald-700 border-emerald-500",
         'Physics': "bg-indigo-100 text-indigo-700 border-indigo-500",
         'Chemistry': "bg-amber-100 text-amber-700 border-amber-500"
     };
-
     ['pillBio', 'pillPhy', 'pillChem'].forEach(id => {
         document.getElementById(id).className = "sub-pill bg-slate-100 text-slate-400 border-2 border-transparent";
     });
-
     const activeId = s === 'Biology' ? 'pillBio' : s === 'Physics' ? 'pillPhy' : 'pillChem';
-    
-    // Apply the fixed styles
     document.getElementById(activeId).className = `sub-pill border-2 ${styles[s]}`;
-    
     renderChapters();
 }
 
@@ -334,7 +367,7 @@ function renderChapters() {
             <div class="icon-circle">${ch.e}</div>
             <h3 class="font-black text-xl leading-tight mb-2">${ch.n}</h3>
             <p class="text-[10px] opacity-60 font-bold uppercase tracking-widest">Neet Exam Prep</p>
-            <div class="mt-8 flex justify-between items-center opacity-40 group">
+            <div class="mt-8 flex justify-between items-center opacity-40">
                 <span class="text-[9px] font-black uppercase tracking-[2px]">Enter Mission</span>
                 <i class="fas fa-arrow-right text-sm"></i>
             </div>
@@ -350,22 +383,17 @@ function openShift(name) {
 
 function closeShift() { document.getElementById('shiftOverlay').style.display = 'none'; }
 
-// 🔥 FIXED: ESC Key to close overlay
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeShift();
+    if (e.key === "Escape") { closeShift(); closeID(); }
 });
 
 function startStudy(mode){
     const chapter = document.getElementById('targetChapter').innerText;
-
-    // 🔥 FIXED: Dynamic Class & Subject Selection Logic
     const clsValue = selectedClass === "11th" ? "11" : "12";
-
     localStorage.setItem("selectedClass", clsValue);
     localStorage.setItem("selectedSubject", selectedSubject);
     localStorage.setItem("selectedChapter", chapter);
     localStorage.setItem("selectedShift", mode);
-
     window.location.href = "test.html";
 }
 
