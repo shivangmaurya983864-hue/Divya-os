@@ -10,221 +10,189 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         :root { --bg: #F8FAFC; --primary: #4F46E5; --secondary: #1E293B; --accent: #F59E0B; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--secondary); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--secondary); height: 100vh; overflow: hidden; display: flex; flex-direction: column; -webkit-tap-highlight-color: transparent; }
         .premium-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); padding: 16px 24px; }
-        .timer-display { background: var(--secondary); color: #fff; padding: 10px 20px; border-radius: 16px; font-variant-numeric: tabular-nums; font-weight: 700; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15); }
-        .test-content { flex: 1; overflow-y: auto; padding: 24px 20px 140px 20px; scroll-behavior: smooth; }
+        .timer-display { background: var(--secondary); color: #fff; padding: 10px 20px; border-radius: 16px; font-variant-numeric: tabular-nums; font-weight: 700; }
+        .test-content { flex: 1; overflow-y: auto; padding: 24px 20px 140px 20px; }
         .q-card { background: white; border-radius: 32px; padding: 32px; max-width: 850px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid #F1F5F9; }
-        .opt-wrapper { display: grid; gap: 16px; margin-top: 24px; }
-        .opt-pill { padding: 18px 24px; border-radius: 20px; border: 2px solid #F1F5F9; background: #fff; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .opt-pill:active { transform: scale(0.98); }
-        .opt-pill.selected { background: #EEF2FF; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1); }
-        .opt-letter { width: 36px; height: 36px; border-radius: 12px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #64748B; transition: 0.2s; }
+        .opt-pill { padding: 18px 24px; border-radius: 20px; border: 2px solid #F1F5F9; background: #fff; display: flex; align-items: center; gap: 16px; cursor: pointer; margin-bottom: 12px; }
+        .opt-pill.selected { background: #EEF2FF; border-color: var(--primary); }
+        .opt-letter { width: 36px; height: 36px; border-radius: 12px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-weight: 700; }
         .selected .opt-letter { background: var(--primary); color: white; }
-        .action-dock { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 600px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border-radius: 28px; padding: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); z-index: 1000; }
-        .btn-base { flex: 1; height: 56px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; border: none; outline: none; }
-        .btn-mark { background: rgba(255,255,255,0.1); }
-        .btn-clear { background: rgba(255,255,255,0.05); color: #94A3B8; }
+        .action-dock { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 600px; background: #0f172ae6; backdrop-filter: blur(10px); border-radius: 28px; padding: 12px; display: flex; align-items: center; gap: 8px; z-index: 1000; }
+        .btn-base { flex: 1; height: 56px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 10px; text-transform: uppercase; border: none; }
         .btn-next { background: var(--primary); flex: 1.5; font-size: 12px; }
         .btn-submit { background: #EF4444; }
-        .map-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 40px 40px 0 0; transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); z-index: 2000; padding: 30px 24px; box-shadow: 0 -20px 40px rgba(0,0,0,0.1); }
+        .btn-clear { background: rgba(255,255,255,0.1); }
+        .map-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 40px 40px 0 0; transition: 0.4s ease; z-index: 2000; padding: 30px 24px; }
         .map-drawer.active { bottom: 0; }
-        .q-dot { aspect-ratio: 1; border-radius: 16px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; border: 2px solid transparent; cursor: pointer; }
+        .q-dot { aspect-ratio: 1; border-radius: 14px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid transparent; }
         .q-dot.done { background: #10B981; color: white; }
-        .q-dot.rev { background: #8B5CF6; color: white; }
-        .q-dot.curr { border-color: var(--primary); background: #fff; color: var(--primary); }
-        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); display: none; z-index: 1500; }
+        .q-dot.curr { border-color: var(--primary); color: var(--primary); }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
         .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
-<div class="overlay" id="overlay" onclick="toggleMap()"></div>
+<div class="overlay" id="overlay"></div>
 
 <nav class="premium-nav flex justify-between items-center">
-    <div onclick="toggleMap()" class="flex items-center gap-4 cursor-pointer">
-        <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
-            <i class="fas fa-th-large text-lg"></i>
+    <div id="indexTrigger" class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600">
+            <i class="fas fa-th-large"></i>
         </div>
         <div>
-            <p class="text-[10px] font-black text-slate-400 tracking-widest leading-none mb-1">INDEX</p>
-            <p class="text-base font-extrabold text-slate-800"><span id="qDisplay">01</span><span class="text-slate-300 mx-1">/</span><span id="totalDisplay">00</span></p>
+            <p class="text-[10px] font-black text-slate-400 tracking-widest leading-none">INDEX</p>
+            <p class="text-base font-extrabold text-slate-800"><span id="qDisplay">01</span>/<span id="totalDisplay">00</span></p>
         </div>
     </div>
     <div class="timer-display" id="timer">25:00</div>
 </nav>
 
-<main class="test-content" id="mainContent">
-    <div class="max-w-xl mx-auto mb-6 flex justify-center">
-        <span id="sectionLabel" class="bg-amber-100 text-amber-700 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-tighter">Loading...</span>
-    </div>
+<main class="test-content">
     <div class="q-card">
-        <h2 id="qText" class="text-xl md:text-2xl font-bold leading-snug text-slate-800">Please wait...</h2>
-        <div id="options" class="opt-wrapper"></div>
+        <h2 id="qText" class="text-xl font-bold text-slate-800 mb-6">Loading...</h2>
+        <div id="options"></div>
     </div>
 </main>
 
 <div class="action-dock">
-    <button onclick="clearAns()" class="btn-base btn-clear"><i class="fas fa-undo-alt mb-1"></i>Clear</button>
-    <button onclick="mark()" class="btn-base btn-mark"><i class="fas fa-bookmark text-amber-400 mb-1"></i>Review</button>
-    <button onclick="nextQ()" class="btn-base btn-next"><span>Save & Next</span><i class="fas fa-arrow-right mt-1 text-[10px]"></i></button>
-    <button onclick="submitTest()" class="btn-base btn-submit"><i class="fas fa-check-double mb-1"></i>Finish</button>
+    <button id="clearBtn" class="btn-base btn-clear"><i class="fas fa-undo-alt mb-1"></i>Clear</button>
+    <button id="nextBtn" class="btn-base btn-next"><span>Save & Next</span></button>
+    <button id="submitBtn" class="btn-base btn-submit"><i class="fas fa-paper-plane mb-1"></i>Finish</button>
 </div>
 
 <div class="map-drawer" id="mapDrawer">
-    <div class="w-16 h-1.5 bg-slate-200 rounded-full mx-auto mb-8" onclick="toggleMap()"></div>
-    <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-extrabold">Question Map</h3></div>
-    <div id="palette" class="grid grid-cols-5 gap-3 overflow-y-auto max-h-[50vh] pb-6"></div>
+    <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div>
+    <div id="palette" class="grid grid-cols-5 gap-3"></div>
 </div>
 
 <script>
-    // 1. Data Retrieval with Type Safety
+    // 1. Core Data
     const cls = localStorage.getItem("selectedClass");
     const sub = localStorage.getItem("selectedSubject");
     const chap = localStorage.getItem("selectedChapter");
     const shift = localStorage.getItem("selectedShift");
 
-    // 2. Strict Filtering (String comparison to avoid number vs string issues)
-    let questions = typeof allQuestions !== 'undefined' ? allQuestions.filter(q => 
+    let questions = allQuestions.filter(q => 
         String(q.class) === String(cls) && 
-        String(q.subject).trim() === String(sub).trim() && 
-        String(q.chapter).trim() === String(chap).trim() && 
-        String(q.shift).trim() === String(shift).trim()
-    ) : [];
+        String(q.subject) === String(sub) && 
+        String(q.chapter) === String(chap) && 
+        String(q.shift) === String(shift)
+    );
 
     let current = 0;
     let timeLeft = 25 * 60;
-    let answers = [];
-    let status = [];
+    let answers = new Array(questions.length).fill(null);
+    let status = new Array(questions.length).fill('not');
 
-    // 3. Initial Safety Check
-    if (questions.length === 0) {
-        document.getElementById("mainContent").innerHTML = `
-            <div class='text-center p-10 bg-white rounded-3xl shadow-xl max-w-md mx-auto mt-20'>
-                <i class="fas fa-exclamation-triangle text-amber-500 text-5xl mb-4"></i>
-                <h1 class='text-xl font-bold mb-2'>No Questions Found!</h1>
-                <p class='text-slate-500 mb-6'>Data mismatch: Check class, subject and chapter names.</p>
-                <button onclick="window.location.href='sets.html'" class='bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold'>Go Back</button>
-            </div>`;
-    } else {
-        answers = new Array(questions.length).fill(null);
-        status = new Array(questions.length).fill('not');
-        document.getElementById("totalDisplay").innerText = questions.length.toString().padStart(2, '0');
-        document.getElementById("sectionLabel").innerText = sub || 'General Science';
-        startTimer();
+    // 2. Mobile Touch Support & Fast Click
+    const getEv = () => ('ontouchstart' in window) ? 'touchstart' : 'click';
+
+    function init() {
+        if(questions.length === 0) {
+            alert("Questions missing!");
+            window.location.href = "sets.html";
+            return;
+        }
+        document.getElementById("totalDisplay").innerText = questions.length;
         render();
-    }
-
-    function startTimer() {
-        const timerInterval = setInterval(() => {
-            if(timeLeft <= 0){
-                clearInterval(timerInterval);
-                submitTest(true);
-                return;
-            }
-            timeLeft--;
-            let m = Math.floor(timeLeft/60);
-            let s = timeLeft%60;
-            document.getElementById("timer").innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }, 1000);
+        startTimer();
     }
 
     function render() {
-        if(!questions[current]) return;
         let q = questions[current];
-        
         document.getElementById("qDisplay").innerText = (current + 1).toString().padStart(2, '0');
         document.getElementById("qText").innerText = q.question;
         
-        let optDiv = document.getElementById("options");
-        optDiv.innerHTML = "";
-        
+        let html = "";
         q.options.forEach((op, i) => {
             let letter = String.fromCharCode(65 + i);
-            let isSelected = answers[current] === letter;
-            optDiv.innerHTML += `
-                <div class="opt-pill ${isSelected ? 'selected' : ''}" onclick="select('${letter}')">
-                    <div class="opt-letter">${letter}</div>
-                    <span class="text-slate-700 font-semibold">${op}</span>
-                </div>`;
+            let sel = answers[current] === letter ? 'selected' : '';
+            html += `<div class="opt-pill ${sel}" data-val="${letter}">
+                        <div class="opt-letter">${letter}</div>
+                        <span class="font-semibold">${op}</span>
+                    </div>`;
+        });
+        document.getElementById("options").innerHTML = html;
+
+        // Re-attach listeners for mobile
+        document.querySelectorAll('.opt-pill').forEach(el => {
+            el.addEventListener('click', () => {
+                answers[current] = el.dataset.val;
+                status[current] = "answered";
+                render();
+            });
         });
         renderPalette();
     }
 
-    function select(val) {
-        answers[current] = val;
-        status[current] = "answered";
-        render();
-    }
-
-    function nextQ() {
-        if(answers[current] === null && status[current] !== "marked") {
-            status[current] = "not-answered";
-        }
-        if(current < questions.length - 1) {
-            current++;
-            render();
-        } else {
-            toggleMap();
-        }
-    }
-
-    function mark() {
-        status[current] = "marked";
-        nextQ();
-    }
-
-    function clearAns() {
-        answers[current] = null;
-        status[current] = "not";
-        render();
-    }
-
     function renderPalette() {
-        let p = document.getElementById("palette");
-        p.innerHTML = "";
+        let html = "";
         status.forEach((s, i) => {
-            let dotCls = "q-dot";
-            if(s === "answered") dotCls += " done";
-            if(s === "marked") dotCls += " rev";
-            if(i === current) dotCls += " curr";
-            p.innerHTML += `<div class="${dotCls}" onclick="jump(${i})">${i+1}</div>`;
+            let c = "q-dot";
+            if(s === "answered") c += " done";
+            if(i === current) c += " curr";
+            html += `<div class="${c}" onclick="jump(${i})">${i+1}</div>`;
         });
+        document.getElementById("palette").innerHTML = html;
     }
 
-    function jump(i) {
-        current = i;
-        render();
-        toggleMap();
-    }
+    function jump(i) { current = i; render(); toggleMap(); }
 
     function toggleMap() {
         document.getElementById("mapDrawer").classList.toggle("active");
         document.getElementById("overlay").classList.toggle("active");
     }
 
-    function submitTest(isAuto = false) {
-        if(questions.length === 0) return;
-        
-        if(isAuto || confirm("Are you sure you want to finish the test?")) {
-            let correct = 0, wrong = 0;
-            answers.forEach((ans, i) => {
-                if(ans !== null) {
-                    if(ans === questions[i].answer) correct++;
-                    else wrong++;
-                }
-            });
+    // --- DIRECT SUBMIT LOGIC ---
+    function submitTest() {
+        // Direct save without confirm popup for mobile compatibility
+        let correct = 0, wrong = 0;
+        answers.forEach((ans, i) => {
+            if(ans !== null) {
+                if(ans === questions[i].answer) correct++;
+                else wrong++;
+            }
+        });
 
-            const score = (correct * 4) - (wrong * 1);
-            localStorage.setItem("lastScore", JSON.stringify({
-                correct: correct, wrong: wrong, score: score, total: questions.length
-            }));
-            localStorage.setItem("userAnswers", JSON.stringify(answers));
-            localStorage.setItem("lastQuestions", JSON.stringify(questions));
-            localStorage.setItem("historySaved", "false"); 
-            window.location.href = "result.html";
-        }
+        const score = (correct * 4) - (wrong * 1);
+        localStorage.setItem("lastScore", JSON.stringify({
+            correct, wrong, score, total: questions.length
+        }));
+        localStorage.setItem("userAnswers", JSON.stringify(answers));
+        localStorage.setItem("lastQuestions", JSON.stringify(questions));
+        
+        // Instant redirect
+        window.location.href = "result.html";
     }
+
+    function startTimer() {
+        setInterval(() => {
+            if(timeLeft <= 0) submitTest();
+            else {
+                timeLeft--;
+                let m = Math.floor(timeLeft/60), s = timeLeft%60;
+                document.getElementById("timer").innerText = `${m}:${s.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    // Event Listeners
+    document.getElementById("nextBtn").addEventListener('click', () => {
+        if(current < questions.length - 1) { current++; render(); }
+        else toggleMap();
+    });
+
+    document.getElementById("submitBtn").addEventListener('click', submitTest);
+    document.getElementById("clearBtn").addEventListener('click', () => {
+        answers[current] = null; status[current] = "not"; render();
+    });
+    document.getElementById("indexTrigger").addEventListener('click', toggleMap);
+    document.getElementById("overlay").addEventListener('click', toggleMap);
+
+    init();
 </script>
 </body>
 </html>
