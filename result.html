@@ -94,7 +94,7 @@
 
     <div class="mb-8">
         <h2 id="scoreValue" class="score-display">0</h2>
-        <p class="text-xs tracking-[0.4em] text-indigo-400 font-bold uppercase">Points Earned</p>
+        <p class="text-xs tracking-[0.4em] text-indigo-400 font-bold uppercase">Score (NEET Pattern)</p>
     </div>
 
     <div class="grid grid-cols-3 gap-4 mb-10">
@@ -127,42 +127,46 @@ function attemptAgain() {
 }
 
 window.onload = () => {
-    const data = JSON.parse(localStorage.getItem('lastScore')) || {correct: 0, wrong: 0, score: 0, total: 1};
-    const score = data.score;
+    const data = JSON.parse(localStorage.getItem('lastScore')) || {
+        correct: 0,
+        wrong: 0,
+        total: 25
+    };
+
+    // ✅ SAFE SCORE CALCULATION 
+    let correct = data.correct || 0;
+    let wrong = data.wrong || 0;
+    let finalScore = (correct * 4) - (wrong * 1);
+    if (finalScore < 0) finalScore = 0;
+
+    let totalMarks = (data.total || 25) * 4;
+
+    // ✅ ATTEMPTED BASED ACCURACY (FIX 1)
+    let attempted = correct + wrong;
+    let accuracy = attempted ? Math.round((correct / attempted) * 100) : 0;
     
-    const scoreEl = document.getElementById('scoreValue');
+    // PERCENTAGE SAFE
+    let percentage = totalMarks ? (finalScore / totalMarks) * 100 : 0;
+
+    // UI Update
+    document.getElementById('correct').innerText = correct;
+    document.getElementById('wrong').innerText = wrong;
+    document.getElementById('accuracy').innerText = accuracy + "%";
+    document.getElementById('scoreValue').innerText = finalScore + " / " + totalMarks;
+
     const titleEl = document.getElementById('resultTitle');
     const iconEl = document.getElementById('statusIcon');
 
-    document.getElementById('correct').innerText = data.correct;
-    document.getElementById('wrong').innerText = data.wrong;
-    document.getElementById('accuracy').innerText = Math.round((data.correct / data.total) * 100) + "%";
-
-    // Score Animation
-    let count = 0;
-    const duration = 1000; // 1 second
-    const increment = Math.ceil(score / (duration / 30));
-    
-    const counter = setInterval(() => {
-        count += increment;
-        if (count >= score) {
-            scoreEl.innerText = score;
-            clearInterval(counter);
-        } else {
-            scoreEl.innerText = count;
-        }
-    }, 30);
-
-    // Dynamic Content & Confetti
-    if (score >= 70) {
+    // Performance Titles
+    if (percentage >= 70) {
         titleEl.innerText = "Elite Victory";
         iconEl.innerText = "👑";
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-    } else if (score >= 50) {
+    } else if (percentage >= 50) {
         titleEl.innerText = "Brilliant Effort";
         iconEl.innerText = "✨";
         confetti({ particleCount: 80, spread: 50 });
-    } else if (score >= 30) {
+    } else if (percentage >= 30) {
         titleEl.innerText = "Keep Rising";
         iconEl.innerText = "🎉";
     } else {
@@ -170,13 +174,15 @@ window.onload = () => {
         iconEl.innerText = "💫";
     }
 
-    // --- SECURE HISTORY SAVE ---
+    // ✅ REPEAT-PROTECTED HISTORY SAVE (FIX 2 & 3)
     try {
-        if (!localStorage.getItem("historySaved")) {
-            let history = JSON.parse(localStorage.getItem("examHistory")) || [];
-            const questions = JSON.parse(localStorage.getItem("lastQuestions")) || [];
-            const userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
+        let history = JSON.parse(localStorage.getItem("examHistory")) || [];
+        const questions = JSON.parse(localStorage.getItem("lastQuestions")) || [];
+        const userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
 
+        // Check if last entry is identical to prevent spam on refresh
+        if (!history.length || history[history.length - 1].score !== finalScore || history[history.length - 1].date !== new Date().toLocaleDateString()) {
+            
             let answers = questions.map((q, i) => ({
                 question: q.question,
                 options: q.options,
@@ -186,15 +192,15 @@ window.onload = () => {
 
             history.push({
                 date: new Date().toLocaleString(),
-                score: data.score,
-                correct: data.correct,
-                wrong: data.wrong,
-                total: data.total,
+                score: finalScore,
+                correct: correct,
+                wrong: wrong,
+                total: data.total || (correct + wrong), // Fallback safety
+                totalMarks: totalMarks,
                 answers: answers
             });
 
             localStorage.setItem("examHistory", JSON.stringify(history));
-            localStorage.setItem("historySaved", "true");
         }
     } catch (e) {
         console.log("History Save Error:", e);

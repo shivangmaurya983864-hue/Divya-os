@@ -15,6 +15,7 @@
         .status-badge { padding: 4px 12px; border-radius: 100px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
         .correct-bg { background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); }
         .wrong-bg { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); }
+        .explanation-box { background: rgba(234, 179, 8, 0.05); border: 1px solid rgba(234, 179, 8, 0.1); }
     </style>
 </head>
 <body class="pb-12">
@@ -54,7 +55,6 @@
 </main>
 
 <script>
-// ✅ Default TRUE kiya hai taaki sirf mistakes dikhein pehle
 let showWrongOnly = true;
 
 function toggleWrong() {
@@ -103,7 +103,7 @@ function loadAnswers() {
     const userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
 
     if(questions.length === 0) {
-        container.innerHTML = "<p class='text-center text-gray-500'>No data found. Start a test first!</p>";
+        container.innerHTML = "<div class='text-center py-20 opacity-50'><i class='fas fa-database mb-4 text-3xl'></i><p>No data found. Start a test first!</p></div>";
         return;
     }
 
@@ -129,41 +129,52 @@ function loadAnswers() {
                 wrong++;
             }
         } else if (!user) {
-            // Not attempted counts as a mistake in review if we want to improve
             wrong++; 
         }
 
-        // ✅ Default filter logic: Agar showWrongOnly true hai, toh correct walo ko skip kar do
         if (showWrongOnly && isCorrect) return;
 
         const card = document.createElement("div");
-        card.className = "answer-card p-6";
+        card.className = "answer-card p-6 mb-6";
         card.innerHTML = `
-            <div class="flex justify-between mb-3">
+            <div class="flex justify-between mb-4">
                 <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Question ${i + 1}</span>
                 <span class="status-badge ${isCorrect ? "text-green-400" : "text-red-400"}">
                     ${isCorrect ? "✔ Perfect" : "✖ Mistake"}
                 </span>
             </div>
-            <p class="mb-5 ${isCorrect ? "text-gray-200" : "text-red-200"} font-semibold leading-relaxed">
+
+            <p class="mb-6 ${isCorrect ? "text-gray-200" : "text-red-100/90"} font-semibold leading-relaxed text-lg">
                 ${q.question}
             </p>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="p-3 rounded-xl ${isCorrect ? "correct-bg border-green-500/20" : "wrong-bg border-red-500/20"} border">
-                    <p class="text-[9px] uppercase font-bold text-gray-500 mb-1">Your Choice</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <div class="p-4 rounded-2xl ${isCorrect ? "correct-bg border-green-500/20" : "wrong-bg border-red-500/20"} border">
+                    <p class="text-[9px] uppercase font-black text-gray-500 mb-1 tracking-wider">Your Choice</p>
                     <p class="font-bold text-sm">${userAns}</p>
                 </div>
-                <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                    <p class="text-[9px] uppercase font-bold text-indigo-400 mb-1">Right Answer</p>
+
+                <div class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                    <p class="text-[9px] uppercase font-black text-indigo-400 mb-1 tracking-wider">Right Answer</p>
                     <p class="font-bold text-sm text-indigo-100">${correctAns}</p>
                 </div>
+            </div>
+
+            <!-- ✅ EXPLANATION SECTION -->
+            <div class="p-5 rounded-2xl explanation-box">
+                <p class="text-[9px] uppercase font-black text-yellow-500 mb-2 tracking-widest">
+                    <i class="fas fa-lightbulb mr-1"></i> Explanation
+                </p>
+                <p class="text-sm text-yellow-100/80 leading-relaxed italic">
+                    ${q.explanation || "Detailed explanation not available for this question. Focus on the core concept!"}
+                </p>
             </div>
         `;
         container.appendChild(card);
     });
 
     if (container.innerHTML === "" && showWrongOnly) {
-        container.innerHTML = "<div class='text-center py-10'><i class='fas fa-trophy text-yellow-500 text-3xl mb-3'></i><p class='text-gray-400'>No mistakes to show! You are a pro. Click 'Show All' to see your wins.</p></div>";
+        container.innerHTML = "<div class='text-center py-20'><i class='fas fa-trophy text-yellow-500 text-5xl mb-4'></i><p class='text-xl font-bold'>Zero Mistakes!</p><p class='text-gray-400'>You've mastered this set. Try showing all to review.</p></div>";
     }
 
     const accuracy = attempted ? Math.round((correct / attempted) * 100) : 0;
